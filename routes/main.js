@@ -16,46 +16,39 @@ module.exports = function(app, shopData) {
     app.get('/about',function(req,res){
         res.render('about.ejs', shopData);
     });                                                                                                                                               
-    app.get('/search', redirectLogin, function(req,res){
-        res.render("search.ejs", shopData);
-    });                                                                                                                                               
+// Search route
+app.get('/search', (req, res) => {
+    const { keyword } = req.query;
+    const searchQuery = `
+        SELECT * FROM stock 
+        WHERE name LIKE ? OR upc LIKE ?`;
 
-    app.get('/search-result', function (req, res) {
-        const keyword = `%${req.query.keyword}%`;
-    
-        // Perform the search in the "stock" table
-        const query = `
-        SELECT 'Stock' AS category, 
-               name AS name, 
-               upc AS upc, 
-               expiry AS expiry, 
-               Date Added AS dateAdded, 
-               Purchase Date AS datePurchased, 
-               Wholesale Price AS wholesalePrice, 
-               Retail Price AS retailPrice
-        FROM stock 
-        WHERE name LIKE ? 
-        OR upc LIKE ? 
-        OR CAST(quantity AS CHAR) LIKE ?
-        OR expiry LIKE ? 
-        OR dateAdded LIKE ? 
-        OR datePurchased LIKE ? 
-        OR CAST(wholesalePrice AS CHAR) LIKE ? 
-        OR CAST(retailPrice AS CHAR) LIKE ?`;
-    
-    
-        db.query(query, [keyword, keyword, keyword, keyword, keyword, keyword, keyword, keyword], (err, results) => {
-            if (err) {
-                console.error('Error executing the search query:', err);
-                res.status(500).send('Internal Server Error');
-                return;
-            }
-    
-            let newData = Object.assign({}, shopData, { results: results });
-            // Process the search results
-            res.render('result.ejs', newData);
-        });
+    db.query(searchQuery, [`%${keyword}%`, `%${keyword}%`], (err, results) => {
+        if (err) {
+            console.error('Error executing the search query:', err);
+            res.status(500).send('Internal Server Error');
+            return;
+        }
+        res.render('result.ejs', { results });
     });
+});
+
+// Search result route
+app.get('/search-result', (req, res) => {
+    const { keyword } = req.query;
+    const searchQuery = `
+        SELECT * FROM stock 
+        WHERE name LIKE ? OR upc LIKE ?`;
+
+    db.query(searchQuery, [`%${keyword}%`, `%${keyword}%`], (err, results) => {
+        if (err) {
+            console.error('Error executing the search query:', err);
+            res.status(500).send('Internal Server Error');
+            return;
+        }
+        res.render('result.ejs', { results });
+    });
+});
     
     
         app.get('/register', function (req,res) {

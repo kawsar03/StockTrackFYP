@@ -1,39 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <link rel="stylesheet"  type="text/css" href="main.css"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search Results</title>
+    <link rel="stylesheet"  type="text/css" href="/main.css" />
+
 </head>
 <body>
-    <section class = "header1">
-
-        <form class = "searchbar" action="/search-result" method="get">
-            <label for="keyword">Enter your search term:</label>
-            <input type="text" id="keyword" name="keyword" placeholder="Search..." required>
-            <button type="submit">Search</button>
-        </form>
-
+    <!-- Display the search result against the whole row in the database (not just name and UPC) -->
     <h1>Search Results</h1>
     <% if (results.length > 0) { %>
-        <ul>
-            <% results.forEach(result => { %>
-                <li>
-                    <strong>Category:</strong> <%= result.category %><br>
-                    <strong>Name:</strong> <%= result.name %><br>
-                    <strong>UPC:</strong> <%= result.upc %><br>
-                    <strong>Quantity:</strong> <%= result.quantity %><br>
-                    <strong>Expiry:</strong> <%= result.expiry %><br>
-                    <strong>Date Added:</strong> <%= result.dateAdded %><br>
-                    <strong>Date Purchased:</strong> <%= result.datePurchased %><br>
-                    <strong>Wholesale Price:</strong> <%= result.wholesalePrice %><br>
-                    <strong>Retail Price:</strong> <%= result.retailPrice %><br>
-                    
-                </li>
-            <% }); %>
-        </ul>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>UPC</th>
+                    <th>Quantity</th>
+                    <th>Expiry</th>
+                    <th>Date Added</th>
+                    <th>Date Purchased</th>
+                    <th>Wholesale Price</th>
+                    <th>Retail Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% results.forEach(result => { %>
+                    <tr>
+                        <td><%= result.name %></td>
+                        <td><%= result.upc %></td>
+                        <td><%= result.quantity %></td>
+                        <td><%= result.expiry %></td>
+                        <td><%= result.dateAdded %></td>
+                        <td><%= result.datePurchased %></td>
+                        <td><%= result.wholesalePrice %></td>
+                        <td><%= result.retailPrice %></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
     <% } else { %>
         <p>No results found.</p>
     <% } %>
-</section>
 </body>
 </html>
