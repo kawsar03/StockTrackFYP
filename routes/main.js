@@ -167,11 +167,14 @@ app.post('/stockItemAdded', function (req, res) {
     // Extract data from the request body
     const { name, upc, quantity, expiry, dateAdded, datePurchased, wholesalePrice, retailPrice } = req.body;
 
+    // Get the username of the logged-in user from the session
+    const username = req.session.userId;
+
     // SQL query to insert data into the stock table
-    const sqlQuery = "INSERT INTO stock (name, upc, quantity, expiry, dateAdded, datePurchased, wholesalePrice, retailPrice) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    const sqlQuery = "INSERT INTO stock (name, upc, quantity, expiry, dateAdded, datePurchased, wholesalePrice, retailPrice, username) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     // Values to be inserted into the stock table
-    const newRecord = [name, upc, quantity, expiry, dateAdded, datePurchased, wholesalePrice, retailPrice];
+    const newRecord = [name, upc, quantity, expiry, dateAdded, datePurchased, wholesalePrice, retailPrice, username];
 
     // Execute the SQL query
     db.query(sqlQuery, newRecord, (err, result) => {

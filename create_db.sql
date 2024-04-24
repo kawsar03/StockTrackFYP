@@ -56,3 +56,12 @@ VALUES
 
 -- Select data from the userdetails table
 SELECT * FROM userdetails;
+
+-- Connect both tables via pk and fk in order to link username to stock table
+ALTER TABLE stock
+ADD COLUMN username VARCHAR(50),
+ADD CONSTRAINT fk_username
+FOREIGN KEY (username)
+REFERENCES userdetails(username)
+ON DELETE CASCADE; 
+-- This line will delete all stock items from the user when the user is deleted
