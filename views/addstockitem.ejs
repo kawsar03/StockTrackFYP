@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/main.css">
+</head>
+<body>
+    <section class="header">
+        <h1><%= shopName %>: Add a Stock Item</h1>
+        <form class="add" method="POST" action="/stockItemAdded">
+            <p>Name: <input id="name" type="text" name="name" value="" /></p>
+            <p>UPC: <input id="upc" type="text" name="upc" value="" /></p>
+            <p>Quantity: <input id="quantity" type="number" name="quantity" value="" /></p>
+            <p>Expiry: <input id="expiry" type="date" name="expiry" value="" /></p>
+            <p>Date Added: <input id="dateAdded" type="date" name="dateAdded" value="" /></p>
+            <p>Date Purchased: <input id="datePurchased" type="date" name="datePurchased" value="" /></p>
+            <p>Wholesale Price: <input id="wholesalePrice" type="number" step="0.01" name="wholesalePrice" value="" /></p>
+            <p>Retail Price: <input id="retailPrice" type="number" step="0.01" name="retailPrice" value="" /></p>
+            <input type="submit" value="Add Stock Item" />
+        </form>
+
+        <form class="searchbar" action="/search-result" method="get">
+            <label for="keyword">Enter your search term:</label>
+            <input type="text" id="keyword" name="keyword" placeholder="Search..." required>
+            <button type="submit">Search</button>
+        </form>
+
+    </section>
+</body>
+</html>
+

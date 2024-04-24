@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <link rel="stylesheet"  type="text/css" href="main.css"/>
+    <title>Search Results</title>
+</head>
+<body>
+    <section class = "header1">
+
+        <form class = "searchbar" action="/search-result" method="get">
+            <label for="keyword">Enter your search term:</label>
+            <input type="text" id="keyword" name="keyword" placeholder="Search..." required>
+            <button type="submit">Search</button>
+        </form>
+
+    <h1>Search Results</h1>
+    <% if (results.length > 0) { %>
+        <ul>
+            <% results.forEach(result => { %>
+                <li>
+                    <strong>Category:</strong> <%= result.category %><br>
+                    <strong>Name:</strong> <%= result.name %><br>
+                    <strong>UPC:</strong> <%= result.upc %><br>
+                    <strong>Quantity:</strong> <%= result.quantity %><br>
+                    <strong>Expiry:</strong> <%= result.expiry %><br>
+                    <strong>Date Added:</strong> <%= result.dateAdded %><br>
+                    <strong>Date Purchased:</strong> <%= result.datePurchased %><br>
+                    <strong>Wholesale Price:</strong> <%= result.wholesalePrice %><br>
+                    <strong>Retail Price:</strong> <%= result.retailPrice %><br>
+                    
+                </li>
+            <% }); %>
+        </ul>
+    <% } else { %>
+        <p>No results found.</p>
+    <% } %>
+</section>
+</body>
+</html>

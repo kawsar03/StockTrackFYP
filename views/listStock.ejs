@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/main.css">
+</head>
+<body>
+    <section class="header">
+        <h1><%= shopName %> </h1>
+        <h2>Here are the current Stock items:</h2>
+        <ul>
+            <% stockItems.forEach(function(item) { %>
+                <li>
+                    Name: <%= item.name %><br>
+                    UPC: <%= item.upc %><br>
+                    Quantity: <%= item.quantity %><br>
+                    Expiry: <%= item.expiry %><br>
+                    Date Added: <%= item.dateAdded %><br>
+                    Date Purchased: <%= item.datePurchased %><br>
+                    Wholesale Price: £ <%= item.wholesalePrice %><br>
+                    Retail Price: £ <%= item.retailPrice %><br>
+                </li>
+            <% }) %>
+        </ul>
+        <p><a href="addstockitem">Add a Stock Item</a></p>
+    </section>
+</body>
+</html>
+

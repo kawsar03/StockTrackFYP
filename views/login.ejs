@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Log into your account for <%=shopName%></title>
+    <link rel="stylesheet"  type="text/css" href="main.css" />
+  </head>
+  <body>
+    <section class = header>
+    <h1 class = "register" >Log in  <%=shopName%></h1>
+    <form class = "registerform" method="POST" action="/loggedin">       
+	<p>username: <input id="username" type="username" name="username" value="username" /></p>
+	<p>password: <input id="password" type="password" name="password" value="password" /></p>
+        <input type="submit" value="Login" />
+      </form>
+    </section>
+  </body>
+</html>

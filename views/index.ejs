@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet"  type="text/css" href="main.css"/>
+  </head>
+
+  <body>
+    <section class="header">
+
+      <form class = "searchbar" action="/search-result" method="get">
+        <label for="keyword">Enter your search term:</label>
+        <input type="text" id="keyword" name="keyword" placeholder="Search..." required>
+        <button type="submit">Search</button>
+    </form>
+
+    <h1>Welcome to <%=shopName%></h1>
+    <p><a href="about">About <%=shopName%></a></p>
+    <p><a href="register">Register with us</a></p>
+    <p><a href="listStock"> Add Stock and see Existing Stock Iteems!</a></p>
+    <p><a href="login"> Log into your account!</a></p>
+    <p><a href="logout"> Log Out!</a></p>
+    <p><a href="removeuser"> Remove a User</a></p>
+    <a href="listusers">List of Users!</a>
+    <p><a href="GamesAPI"> API page</a></p>
+
+  </section>
+
+  </body>
+</html>
