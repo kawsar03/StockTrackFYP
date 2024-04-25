@@ -73,16 +73,25 @@ app.get('/search-result', (req, res) => {
     });                                                                                                                                                
 
     app.get('/listStock', redirectLogin, function(req, res) {
-        // Query database to get all the stock items
-        let sqlquery = "SELECT * FROM stock";
+        const username = req.session.userId;
     
-        // Execute sql query
-        db.query(sqlquery, (err, result) => {
+        // Query database to get all the stock items added by the current user
+        let sqlquery = "SELECT * FROM stock WHERE username = ?";
+    
+        // Execute sql query with username as a parameter
+        db.query(sqlquery, [username], (err, result) => {
             if (err) {
-                res.redirect('./');
+                console.error("Error fetching stock items:", err);
+                return res.redirect('./');
             }
+    
+            // Log the retrieved items for debugging
+            console.log("Retrieved stock items:", result);
+    
+            // Construct data to pass to the template
             let newData = Object.assign({}, shopData, { stockItems: result });
-            console.log(newData);
+    
+            // Render the template with the data
             res.render("listStock.ejs", newData);
         });
     });
