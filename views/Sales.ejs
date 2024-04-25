@@ -1,0 +1,22 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales</title>
+</head>
+<body>
+    <h1>Sales</h1>
+    <% if (errorMessage) { %>
+        <p><%= errorMessage %></p>
+    <% } %>
+    <form action="/processSale" method="post">
+        <label for="keyword">Item Name or UPC:</label>
+        <input type="text" name="keyword"><br>
+        <label for="quantityToSell">Quantity to Sell:</label>
+        <input type="number" name="quantityToSell" min="1"><br>
+        <button type="submit">Sell</button>
+    </form>
+</body>
+</html>

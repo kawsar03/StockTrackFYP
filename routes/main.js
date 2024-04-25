@@ -77,6 +77,58 @@ app.get('/search-result', redirectLogin, (req, res) => {
     app.get('/addstockitem', redirectLogin, function (req,res) {
         res.render('addstockitem.ejs', shopData);
     });
+
+// Sales route
+app.get('/sales', redirectLogin, (req, res) => {
+    res.render('sales.ejs', { errorMessage: null });
+});
+
+// Sales post route
+app.post('/processSale', redirectLogin, (req, res) => {
+    const { keyword, quantityToSell } = req.body;
+    const username = req.session.userId;
+
+    // Query to check if the item exists and has sufficient quantity
+    const checkQuery = `
+        SELECT * FROM stock 
+        WHERE (name LIKE ? OR upc LIKE ?) AND username = ?`;
+
+    db.query(checkQuery, [`%${keyword}%`, `%${keyword}%`, username], (err, results) => {
+        if (err) {
+            console.error('Error executing the search query:', err);
+            res.status(500).send('Internal Server Error');
+            return;
+        }
+
+        if (results.length === 0) {
+            res.render('sales.ejs', { errorMessage: 'Item not found or you do not have permission to sell it.' });
+        } else {
+            const item = results[0];
+            if (item.quantity < quantityToSell) {
+                res.render('sales.ejs', { errorMessage: 'Insufficient quantity to sell.' });
+            } else {
+                // Update quantity in the database
+                const newQuantity = item.quantity - quantityToSell;
+                const updateQuery = `
+                    UPDATE stock 
+                    SET quantity = ? 
+                    WHERE id = ?`;
+
+                db.query(updateQuery, [newQuantity, item.id], (err, result) => {
+                    if (err) {
+                        console.error('Error updating quantity:', err);
+                        res.status(500).send('Internal Server Error');
+                        return;
+                    }
+
+                    res.send(`Successfully sold ${quantityToSell} unit(s) of ${item.name}.`);
+                });
+            }
+        }
+    });
+});
+
+
     app.get('/listusers', function(req, res) {
         // Query database to get all the users
         let sqlquery = "SELECT * FROM userdetails";
