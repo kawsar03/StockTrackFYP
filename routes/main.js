@@ -16,31 +16,51 @@ module.exports = function(app, shopData) {
     app.get('/about',function(req,res){
         res.render('about.ejs', shopData);
     });                                                                                                                                               
+// // Search route
+// app.get('/search', (req, res) => {
+//     const { keyword } = req.query;
+//     const searchQuery = `
+//         SELECT * FROM stock 
+//         WHERE name LIKE ? OR upc LIKE ?`;
+
+//     db.query(searchQuery, [`%${keyword}%`, `%${keyword}%`], (err, results) => {
+//         if (err) {
+//             console.error('Error executing the search query:', err);
+//             res.status(500).send('Internal Server Error');
+//             return;
+//         }
+//         res.render('result.ejs', { results });
+//     });
+// });
+
+// // Search result route
+// app.get('/search-result', (req, res) => {
+//     const { keyword } = req.query;
+//     const username = req.session.userId;
+//     const searchQuery = `
+//         SELECT * FROM stock 
+//         WHERE name LIKE ? OR upc LIKE ?`;
+
+//     db.query(searchQuery, [`%${keyword}%`, `%${keyword}%`], (err, results) => {
+//         if (err) {
+//             console.error('Error executing the search query:', err);
+//             res.status(500).send('Internal Server Error');
+//             return;
+//         }
+//         res.render('result.ejs', { results });
+//     });
+// });
+
 // Search route
-app.get('/search', (req, res) => {
+app.get('/search-result', redirectLogin, (req, res) => {
     const { keyword } = req.query;
+    const username = req.session.userId;
+
     const searchQuery = `
         SELECT * FROM stock 
-        WHERE name LIKE ? OR upc LIKE ?`;
+        WHERE (name LIKE ? OR upc LIKE ?) AND username = ?`;
 
-    db.query(searchQuery, [`%${keyword}%`, `%${keyword}%`], (err, results) => {
-        if (err) {
-            console.error('Error executing the search query:', err);
-            res.status(500).send('Internal Server Error');
-            return;
-        }
-        res.render('result.ejs', { results });
-    });
-});
-
-// Search result route
-app.get('/search-result', (req, res) => {
-    const { keyword } = req.query;
-    const searchQuery = `
-        SELECT * FROM stock 
-        WHERE name LIKE ? OR upc LIKE ?`;
-
-    db.query(searchQuery, [`%${keyword}%`, `%${keyword}%`], (err, results) => {
+    db.query(searchQuery, [`%${keyword}%`, `%${keyword}%`, username], (err, results) => {
         if (err) {
             console.error('Error executing the search query:', err);
             res.status(500).send('Internal Server Error');
