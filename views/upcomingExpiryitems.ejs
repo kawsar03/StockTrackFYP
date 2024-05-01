@@ -1,0 +1,38 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upcoming Expiry Items</title>
+    <link rel="stylesheet" href="main.css"> 
+</head>
+<body>
+    <h1>Upcoming Expiry Items</h1>
+    <% if (items.length === 0) { %>
+        <p>No upcoming expiry items found.</p>
+    <% } else { %>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item Name</th>
+                    <th>UPC</th>
+                    <th>Expiry Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% items.forEach(item => { %>
+                    <tr>
+                        <td><%= item.name %></td>
+                        <td><%= item.upc %></td>
+                        <td><%= item.expiry %></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    <% } %>
+</body>
+</html>
+
+
+

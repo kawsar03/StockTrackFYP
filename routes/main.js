@@ -346,6 +346,76 @@ app.post('/loggedin', function(req, res) {
     });
   });
 
+//   app.get('/upcomingExpiryItems', redirectLogin, function(req, res) {
+//     let today = new Date();
+//     let upcomingDate = new Date();
+//     upcomingDate.setDate(today.getDate() + 4); // Adjust for items expiring in 4 days or less
+
+//     // Query database to get upcoming stock items approaching expiry date
+//     let sqlQuery = "SELECT * FROM stock WHERE expiry <= ?";
+//     db.query(sqlQuery, [upcomingDate], (err, result) => {
+//         if (err) {
+//             console.error("Error retrieving upcoming expiry items:", err);
+//             res.redirect('./');
+//         } else {
+//             // Calculate suggested retail price adjustments
+//             let suggestedPriceAdjustments = result.map(item => {
+//                 let suggestedRetailPrice = (item.retailPrice - item.wholesalePrice) / 2 + item.wholesalePrice;
+//                 return { id: item.id, name: item.name, suggestedRetailPrice: suggestedRetailPrice };
+//             });
+//             res.render("upcomingExpiryItems.ejs", { items: suggestedPriceAdjustments });
+//         }
+//     });
+// });
+
+// app.post('/updateRetailPrice', redirectLogin, function(req, res) {
+//     console.log("Request Body:", req.body); // Log the entire request body
+
+//     let updates = req.body.updates; // Contains updated retail prices for items
+//     console.log("Updates:", updates); // Log the updates object
+
+//     if (!updates) {
+//         console.log("No updates received.");
+//         res.redirect('./upcomingExpiryItems');
+//         return;
+//     }
+
+//     // Update retail prices in the database
+//     let updateQueries = updates.map(update => {
+//         return db.query("UPDATE stock SET retailPrice = ? WHERE upc = ?", [update.retailPrice, update.upc]);
+//     });
+
+//     // Execute all update queries
+//     Promise.all(updateQueries)
+//         .then(() => {
+//             console.log("Retail prices updated successfully.");
+//             res.redirect('./upcomingExpiryItems');
+//         })
+//         .catch(err => {
+//             console.error("Error updating retail prices:", err);
+//             res.redirect('./upcomingExpiryItems');
+//         });
+// });
+
+app.get('/upcomingExpiryItems', redirectLogin, function(req, res) {
+    const username = req.session.userId;
+    let today = new Date();
+    let upcomingDate = new Date();
+    upcomingDate.setDate(today.getDate() + 4); // Adjust for items expiring in 4 days or less
+
+    // Query database to get upcoming stock items approaching expiry date for the current user
+    let sqlQuery = "SELECT * FROM stock WHERE expiry <= ? AND username = ? AND quantity > 0";
+    db.query(sqlQuery, [upcomingDate, username], (err, result) => {
+        if (err) {
+            console.error("Error retrieving upcoming expiry items:", err);
+            res.redirect('./');
+        } else {
+            res.render("upcomingExpiryItems.ejs", { items: result });
+        }
+    });
+});
+
+
 
     
 }
