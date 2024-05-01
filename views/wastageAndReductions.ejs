@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wastage and Reductions</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS stylesheet -->
+</head>
+<body>
+    <h1>Wastage and Reductions</h1>
+    <form action="/processWastageAndReductions" method="post">
+        <div>
+            <label for="nameUPC">Name/UPC:</label>
+            <input type="text" id="nameUPC" name="nameUPC" required>
+        </div>
+        <div>
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" name="quantity" min="1">
+        </div>
+        <div>
+            <label for="retailPrice">Retail Price:</label>
+            <input type="number" id="retailPrice" name="retailPrice" step="0.01" min="0">
+        </div>
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
+
+
+
+

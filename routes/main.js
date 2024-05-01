@@ -415,6 +415,60 @@ app.get('/upcomingExpiryItems', redirectLogin, function(req, res) {
     });
 });
 
+app.get('/wastageAndReductions', redirectLogin, function(req, res) {
+    res.render('wastageAndReductions.ejs');
+});
+
+app.post('/processWastageAndReductions', redirectLogin, function(req, res) {
+    const { nameUPC, quantity, retailPrice } = req.body;
+    const username = req.session.userId;
+
+    // Check if either quantity or retail price is provided
+    if (!quantity && !retailPrice) {
+        // If neither quantity nor retail price is provided, render the page again with an error message
+        return res.render('wastageAndReductions.ejs', { errorMessage: 'Please provide either quantity or retail price.' });
+    }
+
+    // Query the database to find the item matching the provided name/UPC for the current user
+    let query = "SELECT * FROM stock WHERE (name = ? OR upc = ?) AND username = ?";
+    db.query(query, [nameUPC, nameUPC, username], (err, results) => {
+        if (err) {
+            console.error("Error querying database:", err);
+            return res.status(500).send('Internal Server Error');
+        }
+
+        if (results.length === 0) {
+            // If no matching item is found, render the page again with an error message
+            return res.render('wastageAndReductions.ejs', { errorMessage: 'No item found with the provided name/UPC.' });
+        }
+
+        // Update the quantity or retail price of the matching item
+        const item = results[0];
+        let updateQuery = "";
+        let updateValues = [];
+
+        if (quantity) {
+            // If quantity is provided, update the quantity of the item
+            updateQuery = "UPDATE stock SET quantity = ? WHERE id = ? AND username = ?";
+            updateValues = [quantity, item.id, username];
+        } else {
+            // If retail price is provided, update the retail price of the item
+            updateQuery = "UPDATE stock SET retailPrice = ? WHERE id = ? AND username = ?";
+            updateValues = [retailPrice, item.id, username];
+        }
+
+        // Execute the update query
+        db.query(updateQuery, updateValues, (err, result) => {
+            if (err) {
+                console.error("Error updating database:", err);
+                return res.status(500).send('Internal Server Error');
+            }
+
+            // Render the page with a success message
+            res.render('wastageAndReductions.ejs', { successMessage: 'Item updated successfully.'  + '<a href='+'./'+'> Home</a>' });
+        });
+    });
+});
 
 
     
