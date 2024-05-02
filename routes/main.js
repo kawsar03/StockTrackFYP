@@ -416,7 +416,7 @@ app.get('/upcomingExpiryItems', redirectLogin, function(req, res) {
 });
 
 app.get('/wastageAndReductions', redirectLogin, function(req, res) {
-    res.render('wastageAndReductions.ejs');
+    res.render('wastageAndReductions.ejs', {errorMessage:""});
 });
 
 app.post('/processWastageAndReductions', redirectLogin, function(req, res) {
@@ -465,7 +465,7 @@ app.post('/processWastageAndReductions', redirectLogin, function(req, res) {
             }
 
             // Render the page with a success message
-            res.render('wastageAndReductions.ejs', { successMessage: 'Item updated successfully.'  + '<a href='+'./'+'> Home</a>' });
+            res.render('wastageAndReductions.ejs', { errorMessage: 'Item updated successfully.'  + '<a href='+'./'+'> Home</a>' });
         });
     });
 });
