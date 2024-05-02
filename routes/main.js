@@ -470,6 +470,9 @@ app.post('/processWastageAndReductions', redirectLogin, function(req, res) {
     });
 });
 
+app.get('/BCSTest', redirectLogin, function (req,res) {
+    res.render('BCSTest.ejs', shopData);
+});
 
     
 }
