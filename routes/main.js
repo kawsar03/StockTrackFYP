@@ -207,40 +207,39 @@ app.post('/userremoved', redirectLogin, function (req, res) {
     });
 });
 
+
 const http = require('https');
+    app.get('/currencyX', function (req, res) {
+        const options = {
+            method: 'GET',
+            hostname: 'exchange-rate-api1.p.rapidapi.com',
+            port: null,
+            path: '/convert?base=USD&target=GBP',
+            headers: {
+                'X-RapidAPI-Key': '9eedca4fd5msh5af26b25ea04c8cp125324jsne858df1f6b2e',
+                'X-RapidAPI-Host': 'exchange-rate-api1.p.rapidapi.com'
+            }
+        };
 
-app.get('/GamesAPI', function (req, res) {
-    const requestOptions = {
-        method: 'GET',
-        hostname: 'free-to-play-games-database.p.rapidapi.com',
-        port: null,
-        path: '/api/filter?tag=3d.mmorpg.fantasy.pvp&platform=pc',
-        headers: {
-            'X-RapidAPI-Key': '5b3d4c744dmsh71f2384b8fd09f8p1763d4jsnd48eb0dfdb8a',
-            'X-RapidAPI-Host': 'free-to-play-games-database.p.rapidapi.com'
-        }
-    };
+        const apiReq = http.request(options, function (apiRes) {
+            const chunks = [];
 
-    const gameHttpRequest = http.request(requestOptions, function (response) {
-        console.log('Response status code:', response.statusCode);
+            apiRes.on('data', function (chunk) {
+                chunks.push(chunk);
+            });
 
-        const chunks = [];
+            apiRes.on('end', function () {
+                const body = Buffer.concat(chunks);
+                const result = JSON.parse(body.toString());
 
-        response.on('data', function (chunk) {
-            chunks.push(chunk);
+                // Render the EJS template with the exchange rate information
+                res.render('currencyX', { result });
+            });
         });
 
-        response.on('end', function () {
-            const body = Buffer.concat(chunks);
-            const games = JSON.parse(body.toString());
-
-            // Pass the games data to the EJS template
-            res.render('GamesAPI', { shopName: 'PC Forum', games });
-        });
+        apiReq.end();
     });
 
-    gameHttpRequest.end();
-});
 
 
 
