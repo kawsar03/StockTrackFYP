@@ -1,0 +1,63 @@
+/* Styles for the index page */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+  }
+
+.h1 {
+ text-align: center;
+  }
+  
+  .searchbar {
+    display: flex;
+    align-items: center;
+  }
+  
+  .searchbar input[type="text"] {
+    margin-right: 10px;
+  }
+  
+  .links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  
+  .links a {
+    text-decoration: none;
+    color: #333;
+    border: 1px solid #ccc;
+    padding: 10px;
+    display: block;
+    text-align: center;
+  }
+  
+  .links a:hover {
+    background-color: #f0f0f0;
+  }
+  
+  /* Styles for the index page */
+.links {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Two columns */
+    gap: 20px;
+    justify-content: center; /* Center the grid */
+  }
+  
+  .links a {
+    text-decoration: none;
+    color: #333;
+    border: 1px solid #ccc;
+    padding: 10px;
+    display: block;
+    text-align: center;
+    width: 200px; /* Set width to control card size */
+    margin: auto; /* Center the cards */
+  }
+  
+  .links a:hover {
+    background-color: #f0f0f0;
+  }
+  

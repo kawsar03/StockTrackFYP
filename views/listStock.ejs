@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
     <link rel="stylesheet" type="text/css" href="/main.css">
@@ -24,5 +24,60 @@
         <p><a href="addstockitem">Add a Stock Item</a></p>
     </section>
 </body>
-</html>
+</html> -->
 
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/listStock.css">
+</head>
+<body>
+    <section class="header">
+        <h1><%= shopName %> </h1>
+        <h2>Here are the current Stock items:</h2>
+        <form class="searchbar" action="/search-result" method="get">
+            <label for="keyword">Enter your search term:</label>
+            <input type="text" id="keyword" name="keyword" placeholder="Search..." required>
+            <button type="submit">Search</button>
+        </form>
+        <div id="slideshow-container">
+            <% stockItems.forEach(function(item, index) { %>
+                <div class="slideshow-item" id="item<%= index %>">
+                    <p>Name: <%= item.name %></p>
+                    <p>UPC: <%= item.upc %></p>
+                    <p>Quantity: <%= item.quantity %></p>
+                    <p>Expiry: <%= item.expiry %></p>
+                    <p>Date Added: <%= item.dateAdded %></p>
+                    <p>Date Purchased: <%= item.datePurchased %></p>
+                    <p>Wholesale Price: £ <%= item.wholesalePrice %></p>
+                    <p>Retail Price: £ <%= item.retailPrice %></p>
+                </div>
+            <% }) %>
+        </div>
+        <button onclick="nextSlide()">Next</button>
+    </section>
+
+    <script>
+        let currentIndex = 0;
+        const slides = document.querySelectorAll('.slideshow-item');
+
+        function showSlide(index) {
+            slides.forEach(slide => {
+                slide.style.display = 'none';
+            });
+            slides[index].style.display = 'block';
+        }
+
+        function nextSlide() {
+            currentIndex = (currentIndex + 1) % slides.length;
+            showSlide(currentIndex);
+        }
+
+        // Show the first slide initially
+        showSlide(currentIndex);
+    </script>
+
+<p><a href="addstockitem">Add a Stock Item</a></p>
+
+</body>
+</html>

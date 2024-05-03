@@ -1,4 +1,4 @@
-<!doctype html>
+<!-- <!doctype html>
 <html>
   <head>
     <link rel="stylesheet"  type="text/css" href="main.css"/>
@@ -32,4 +32,48 @@
   </section>
 
   </body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to <%= shopName %></title>
+    <link rel="stylesheet" type="text/css" href="index.css">
+</head>
+<body>
+    <section class="header">
+        <div class="left-section">
+            <h1>Welcome to <%= shopName %></h1>
+            <p><a href="register">Register with us</a></p>
+            <p><a href="login"> Log into your account!</a></p>
+        </div>
+        <form class="searchbar" action="/search-result" method="get">
+            <label for="keyword">Enter your search term:</label>
+            <input type="text" id="keyword" name="keyword" placeholder="Search..." required>
+            <button type="submit">Search</button>
+        </form>
+    </section>
+
+    <section class="links">
+        <p><a href="listStock"> Add Stock and see Existing Stock Items!</a></p>
+        <p><a href="about">About <%= shopName %></a></p>
+        <p><a href="logout"> Log Out!</a></p>
+        <p><a href="removeuser"> Delete your Account</a></p>
+        <p><a href="currencyX"> Convert Currency For Sales!</a></p>
+        <p><a href="Sales"> Sell Items here!</a></p>
+        <p><a href="upcomingExpiryitems"> Check expiring stock!</a></p>
+        <p><a href="wastageAndReductions"> Wastage And Reductions</a></p>
+        <!-- For Test Purposes -->
+        <!-- <p><a href="BCSTest"> BSC Test</a></p> -->
+        <!-- <p><a href="listusers">List of Users!</a></p> -->
+
+    </section>
+</body>
 </html>
+
+
+
+

@@ -12,10 +12,17 @@ module.exports = function(app, shopData) {
     // Handle our routes
     app.get('/',function(req,res){
         res.render('index.ejs', shopData)
-    });                                                                                                                                               
+    });        
+    
+
     app.get('/about',function(req,res){
         res.render('about.ejs', shopData);
-    });                                                                                                                                               
+    });        
+    
+
+     
+    
+
 // // Search route
 // app.get('/search', (req, res) => {
 //     const { keyword } = req.query;
@@ -395,6 +402,24 @@ app.post('/loggedin', function(req, res) {
 //             res.redirect('./upcomingExpiryItems');
 //         });
 // });
+//Working app.get
+// app.get('/upcomingExpiryItems', redirectLogin, function(req, res) {
+//     const username = req.session.userId;
+//     let today = new Date();
+//     let upcomingDate = new Date();
+//     upcomingDate.setDate(today.getDate() + 4); // Adjust for items expiring in 4 days or less
+
+//     // Query database to get upcoming stock items approaching expiry date for the current user
+//     let sqlQuery = "SELECT * FROM stock WHERE expiry <= ? AND username = ? AND quantity > 0";
+//     db.query(sqlQuery, [upcomingDate, username], (err, result) => {
+//         if (err) {
+//             console.error("Error retrieving upcoming expiry items:", err);
+//             res.redirect('./');
+//         } else {
+//             res.render("upcomingExpiryItems.ejs", { items: result });
+//         }
+//     });
+// });
 
 app.get('/upcomingExpiryItems', redirectLogin, function(req, res) {
     const username = req.session.userId;
@@ -403,7 +428,7 @@ app.get('/upcomingExpiryItems', redirectLogin, function(req, res) {
     upcomingDate.setDate(today.getDate() + 4); // Adjust for items expiring in 4 days or less
 
     // Query database to get upcoming stock items approaching expiry date for the current user
-    let sqlQuery = "SELECT * FROM stock WHERE expiry <= ? AND username = ? AND quantity > 0";
+    let sqlQuery = "SELECT *, (retailPrice - wholesalePrice) / 2 + wholesalePrice AS suggestedRetailPrice FROM stock WHERE expiry <= ? AND username = ? AND quantity > 0";
     db.query(sqlQuery, [upcomingDate, username], (err, result) => {
         if (err) {
             console.error("Error retrieving upcoming expiry items:", err);
@@ -413,6 +438,8 @@ app.get('/upcomingExpiryItems', redirectLogin, function(req, res) {
         }
     });
 });
+
+
 
 app.get('/wastageAndReductions', redirectLogin, function(req, res) {
     res.render('wastageAndReductions.ejs', {errorMessage:""});
@@ -472,6 +499,7 @@ app.post('/processWastageAndReductions', redirectLogin, function(req, res) {
 app.get('/BCSTest', redirectLogin, function (req,res) {
     res.render('BCSTest.ejs', shopData);
 });
+
 
     
 }
