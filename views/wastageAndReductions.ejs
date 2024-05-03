@@ -21,11 +21,40 @@
             <label for="retailPrice">Retail Price:</label>
             <input type="number" id="retailPrice" name="retailPrice" step="0.01" min="0">
         </div>
+        <button type="button" id="scanBarcodeButton">Scan Barcode</button> <!-- Change type to "button" -->
         <button type="submit">Submit</button>
     </form>
+    <div id="qr-reader" style="width: 600px; display: none;"></div> <!-- Barcode scanner element, initially hidden -->
     <%=errorMessage%>
+
+    <!-- Include the library -->
+    <script src="https://unpkg.com/html5-qrcode@2.0.9/dist/html5-qrcode.min.js"></script>
+    <script>
+        // Function to handle successful barcode scan
+        function onScanSuccess(decodedText, decodedResult) {
+            console.log(`Code scanned = ${decodedText}`, decodedResult);
+            // Update the scanned value in the "Name/UPC" input field
+            document.getElementById('nameUPC').value = decodedText;
+        }
+
+        // Initialize the barcode scanner
+        var html5QrcodeScanner = new Html5QrcodeScanner(
+            "qr-reader", { fps: 10, qrbox: 250 });
+        
+        // Function to show the barcode scanner
+        function showBarcodeScanner() {
+            document.getElementById('qr-reader').style.display = 'block';
+            // Start the barcode scanner
+            html5QrcodeScanner.render(onScanSuccess);
+        }
+
+        // Event listener for the "Scan Barcode" button
+        document.getElementById('scanBarcodeButton').addEventListener('click', showBarcodeScanner);
+    </script>
 </body>
 </html>
+
+
 
 
 

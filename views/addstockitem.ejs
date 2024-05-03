@@ -9,6 +9,11 @@
         <form class="add" method="POST" action="/stockItemAdded">
             <p>Name: <input id="name" type="text" name="name" value="" /></p>
             <p>UPC: <input id="upc" type="text" name="upc" value="" /></p>
+            <!-- Add a button for scanning barcode -->
+            <button id="scanBarcodeBtn" type="button">Scan Barcode</button>
+            <div id="qr-reader-container" style="display: none;"> <!-- Container initially hidden -->
+                <div id="qr-reader" style="width: 300px; height: 300px;"></div> <!-- Barcode scanner container -->
+            </div>
             <p>Quantity: <input id="quantity" type="number" name="quantity" value="" /></p>
             <p>Expiry: <input id="expiry" type="date" name="expiry" value="" /></p>
             <p>Date Added: <input id="dateAdded" type="date" name="dateAdded" value="" /></p>
@@ -23,8 +28,29 @@
             <input type="text" id="keyword" name="keyword" placeholder="Search..." required>
             <button type="submit">Search</button>
         </form>
-
     </section>
+
+    <!-- Include the barcode scanning script -->
+    <script src="https://unpkg.com/html5-qrcode@2.0.9/dist/html5-qrcode.min.js"></script>
+    <script>
+        // Function to handle successful barcode scanning
+        function onScanSuccess(decodedText, decodedResult) {
+            console.log(`Barcode scanned: ${decodedText}`);
+            document.getElementById('upc').value = decodedText; // Set the scanned barcode value to the UPC input field
+        }
+
+        // Initialize the barcode scanner
+        var html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { fps: 10, qrbox: 250 });
+
+        // Add event listener for the scan barcode button
+        document.getElementById('scanBarcodeBtn').addEventListener('click', function() {
+            // Show the barcode scanner container
+            document.getElementById('qr-reader-container').style.display = 'block';
+            // Start scanning
+            html5QrcodeScanner.render(onScanSuccess);
+        });
+    </script>
 </body>
 </html>
+
 

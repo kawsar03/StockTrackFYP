@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,10 +12,34 @@
     <% } %>
     <form action="/processSale" method="post">
         <label for="keyword">Item Name or UPC:</label>
-        <input type="text" name="keyword"><br>
+        <input type="text" name="keyword" id="keyword"><br>
         <label for="quantityToSell">Quantity to Sell:</label>
-        <input type="number" name="quantityToSell" min="1"><br>
+        <input type="number" name="quantityToSell" id="quantityToSell" min="1"><br>
+        <button type="button" onclick="scanBarcode()">Scan Barcode</button><br>
         <button type="submit">Sell</button>
     </form>
+
+    <!-- Include the library -->
+    <script src="https://unpkg.com/html5-qrcode@2.0.9/dist/html5-qrcode.min.js"></script>
+
+    <!-- Script to handle barcode scanning -->
+    <script>
+        function onScanSuccess(decodedText, decodedResult) {
+            console.log(`Code scanned = ${decodedText}`, decodedResult);
+            // Fill the keyword field with the scanned barcode
+            document.getElementById('keyword').value = decodedText;
+        }
+
+        function scanBarcode() {
+            var html5QrcodeScanner = new Html5QrcodeScanner(
+                "qr-reader", { fps: 10, qrbox: 250 });
+            html5QrcodeScanner.render(onScanSuccess);
+        }
+    </script>
+
+    <!-- HTML element for QR code reader -->
+    <div id="qr-reader"></div>
 </body>
 </html>
+
+
