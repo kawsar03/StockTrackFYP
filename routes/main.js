@@ -1,14 +1,16 @@
 module.exports = function(app, shopData) {
+//validation checker
+const { check, validationResult } = require('express-validator');
+
 
     const redirectLogin = (req, res, next) => {
         if (!req.session.userId ) {
           res.redirect('./login')
         } else { next (); }
     }
-
-    const { check, validationResult } = require('express-validator');
-
-                                                                                                                                                      
+           
+    
+    
     // Handle our routes
     app.get('/',function(req,res){
         res.render('index.ejs', shopData)
@@ -21,7 +23,7 @@ module.exports = function(app, shopData) {
     
 
      
-    
+
 
 // // Search route
 // app.get('/search', (req, res) => {
@@ -421,6 +423,91 @@ app.post('/loggedin', function(req, res) {
 //     });
 // });
 
+// working app.get 
+// app.get('/upcomingExpiryItems', redirectLogin, function(req, res) {
+//     const username = req.session.userId;
+//     let today = new Date();
+//     let upcomingDate = new Date();
+//     upcomingDate.setDate(today.getDate() + 4); // Adjust for items expiring in 4 days or less
+
+//     // Query database to get upcoming stock items approaching expiry date for the current user
+//     let sqlQuery = "SELECT *, (retailPrice - wholesalePrice) / 2 + wholesalePrice AS suggestedRetailPrice FROM stock WHERE expiry <= ? AND username = ? AND quantity > 0";
+//     db.query(sqlQuery, [upcomingDate, username], (err, result) => {
+//         if (err) {
+//             console.error("Error retrieving upcoming expiry items:", err);
+//             res.redirect('./');
+//         } else {
+//             res.render("upcomingExpiryItems.ejs", { items: result });
+//         }
+//     });
+// });
+
+const nodemailer = require('nodemailer');
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'stocktrackteam@gmail.com', //  email address
+        pass: 'ttdi mhoh bjax cdkv' //  email password 
+    }
+});
+
+
+// working V2 but only email screen displays
+// app.get('/upcomingExpiryItems', redirectLogin, function(req, res) {
+//     const username = req.session.userId; // Assuming the session contains the user ID
+//     let today = new Date();
+//     let upcomingDate = new Date();
+//     upcomingDate.setDate(today.getDate() + 4); // Adjust for items expiring in 4 days or less
+
+//     // Query database to get upcoming stock items approaching expiry date for the current user
+//     let sqlQuery = "SELECT *, (retailPrice - wholesalePrice) / 2 + wholesalePrice AS suggestedRetailPrice FROM stock WHERE expiry <= ? AND username = ? AND quantity > 0";
+//     db.query(sqlQuery, [upcomingDate, username], (err, result) => {
+//         if (err) {
+//             console.error("Error retrieving upcoming expiry items:", err);
+//             res.redirect('./');
+//         } else {
+//             // Retrieve the user's email address from the database
+//             let emailQuery = "SELECT email FROM userdetails WHERE username = ?";
+//             db.query(emailQuery, [username], (err, emailResult) => {
+//                 if (err) {
+//                     console.error("Error retrieving user email:", err);
+//                     res.status(500).send("Internal server error");
+//                 } else if (emailResult.length === 0) {
+//                     res.status(404).send("User not found");
+//                 } else {
+//                     const userEmail = emailResult[0].email;
+//                     // Compose email message with the retrieved email address
+//                     const mailOptions = {
+//                         from: 'stocktrackteam@gmail.com',
+//                         to: userEmail, // Use the retrieved email address
+//                         subject: 'Upcoming Expiry Items',
+//                         html: `
+//                             <p>Dear ${username},</p>
+//                             <p>Your upcoming expiring items:</p>
+//                             <ul>
+//                                 ${result.map(item => `<li>${item.name} - Quantity: ${item.quantity} - Expiry Date: ${item.expiry}</li>`).join('')}
+//                             </ul>
+//                             <p>Please take necessary action.</p>
+//                             <p>Regards,<br>StockTrack Team</p>
+//                         `
+//                     };
+
+//                     // Send email
+//                     transporter.sendMail(mailOptions, (error, info) => {
+//                         if (error) {
+//                             console.error('Error sending email:', error);
+//                             res.status(500).send("Internal server error");
+//                         } else {
+//                             console.log('Email sent:', info.response);
+//                             res.status(200).send("Email sent successfully");
+//                         }
+//                     });
+//                 }
+//             });
+//         }
+//     });
+// });
+
 app.get('/upcomingExpiryItems', redirectLogin, function(req, res) {
     const username = req.session.userId;
     let today = new Date();
@@ -434,17 +521,53 @@ app.get('/upcomingExpiryItems', redirectLogin, function(req, res) {
             console.error("Error retrieving upcoming expiry items:", err);
             res.redirect('./');
         } else {
+            // Get the email address of the user from the database
+            let userEmailQuery = "SELECT email FROM userdetails WHERE username = ?";
+            db.query(userEmailQuery, [username], (emailErr, emailResult) => {
+                if (emailErr) {
+                    console.error("Error retrieving user email:", emailErr);
+                } else {
+                    const userEmail = emailResult[0].email; // Assuming there's only one email associated with the username
+
+                    // Compose email message
+                    const mailOptions = {
+                        from: 'stocktrackteam@gmail.com',
+                        to: userEmail, // Using the retrieved email address from the database
+                        subject: 'Upcoming Expiry Items',
+                        html: `
+                            <p>Dear ${username},</p>
+                            <p>Your upcoming expiring items:</p>
+                            <ul>
+                                ${result.map(item => `<li>${item.name} - Quantity: ${item.quantity} - Expiry Date: ${item.expiry}</li>`).join('')}
+                            </ul>
+                            <p>Please take necessary action.</p>
+                            <p>Regards,<br>StockTrack Team</p>
+                        `
+                    };
+
+                    // Send email
+                    transporter.sendMail(mailOptions, function(error, info) {
+                        if (error) {
+                            console.error("Error sending email:", error);
+                        } else {
+                            console.log("Email sent:", info.response);
+                        }
+                    });
+                }
+            });
+
+            // Render the page with the fetched items
             res.render("upcomingExpiryItems.ejs", { items: result });
         }
     });
 });
 
 
-
 app.get('/wastageAndReductions', redirectLogin, function(req, res) {
     res.render('wastageAndReductions.ejs', {errorMessage:""});
 });
 
+// Working app.post
 app.post('/processWastageAndReductions', redirectLogin, function(req, res) {
     const { nameUPC, quantity, retailPrice } = req.body;
     const username = req.session.userId;
@@ -491,7 +614,7 @@ app.post('/processWastageAndReductions', redirectLogin, function(req, res) {
             }
 
             // Render the page with a success message
-            res.render('wastageAndReductions.ejs', { errorMessage: 'Item updated successfully.'  + '<a href='+'./'+'> Home</a>' });
+            res.render('wastageAndReductions.ejs', { errorMessage: 'Item updated successfully.' });
         });
     });
 });
