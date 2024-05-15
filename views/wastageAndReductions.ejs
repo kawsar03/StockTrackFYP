@@ -4,7 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wastage and Reductions</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS stylesheet -->
+    <style>body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+    
+    .content {
+        min-height: calc(100vh - 60px); /* Adjust based on the footer height */
+    }
+    
+    .footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: #333;
+        padding: 10px 0;
+    }
+    
+    .navbar {
+        text-align: center;
+    }
+    
+    .navbar ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .navbar ul li {
+        display: inline;
+        margin-right: 20px;
+    }
+    
+    .navbar ul li:last-child {
+        margin-right: 0;
+    }
+    
+    .navbar ul li a {
+        color: white;
+        text-decoration: none;
+    }
+    
+    .navbar ul li a:hover {
+        text-decoration: underline;
+    }
+    </style>
 </head>
 <body>
     <h1>Wastage and Reductions</h1>
@@ -15,7 +60,7 @@
         </div>
         <div>
             <label for="quantity">Quantity:</label>
-            <input type="number" id="quantity" name="quantity" min="1">
+            <input type="number" id="quantity" name="quantity" min="0">
         </div>
         <div>
             <label for="retailPrice">Retail Price:</label>
@@ -51,11 +96,21 @@
         // Event listener for the "Scan Barcode" button
         document.getElementById('scanBarcodeButton').addEventListener('click', showBarcodeScanner);
     </script>
+
+<footer class="footer">
+    <nav class="navbar">
+        <ul>
+            <li><a href="Dashboard">Dashboard</a></li>
+            <li><a href="addstockitem">Add Stock Item</a></li>
+            <li><a href="currencyX">CurrencyX</a></li>
+            <li><a href="expired">Expired</a></li>
+            <li><a href="liststock">List Stock</a></li>
+            <li><a href="sales">Sales</a></li>
+            <li><a href="upcomingExpiryitems">Upcoming Expiry Items</a></li>
+            <li><a href="wastageandreductions">Wastage and Reductions</a></li>
+        </ul>
+    </nav>
+</footer>
+
 </body>
 </html>
-
-
-
-
-
-

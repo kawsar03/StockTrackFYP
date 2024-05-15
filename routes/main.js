@@ -16,57 +16,43 @@ const { check, validationResult } = require('express-validator');
         res.render('index.ejs', shopData)
     });        
     
-
+// Route for About page
     app.get('/about',function(req,res){
         res.render('about.ejs', shopData);
     });        
-    
-    app.get('/Dashboard', redirectLogin,function(req,res){
-        res.render('Dashboard.ejs', shopData);
-    });  
      
+// Dashboard Route and Notifcation center
+app.get('/dashboard', redirectLogin, function(req, res) {
+    // Uses req.session to check if the user has already received a notifcation
+    if (req.session.notifiedAboutExpiringItems) {
+        // Display dashboard if notified
+        return res.render('dashboard', { shopName: "Stock Track", expiringSoon: false });
+    }
 
+    // Query the database for items expiring in 4 days for notification
+    let sqlQuery = "SELECT * FROM stock WHERE expiry < DATE_ADD(CURDATE(), INTERVAL 4 DAY) AND username = ?";
+    db.query(sqlQuery, [req.session.userId], (err, result) => {
+        if (err) {
+            return res.status(500).send('Internal Server Error');
+        }
 
-// // Search route
-// app.get('/search', (req, res) => {
-//     const { keyword } = req.query;
-//     const searchQuery = `
-//         SELECT * FROM stock 
-//         WHERE name LIKE ? OR upc LIKE ?`;
+        // Check if there are expiring stock items (has to be more than 0)
+        if (result.length > 0) {
+            // Display pop-up notification and redirect to dashboard
+            req.session.notifiedAboutExpiringItems = true; // Set value to true so when redirected to dashboard it will not give them another notification until the next session is started and this value is reset
+            return res.send("<script>alert('You have items expiring soon! Please check the Expiring Soon page and consider a price reduction.'); window.location.href='/dashboard';</script>");
+        }
 
-//     db.query(searchQuery, [`%${keyword}%`, `%${keyword}%`], (err, results) => {
-//         if (err) {
-//             console.error('Error executing the search query:', err);
-//             res.status(500).send('Internal Server Error');
-//             return;
-//         }
-//         res.render('result.ejs', { results });
-//     });
-// });
-
-// // Search result route
-// app.get('/search-result', (req, res) => {
-//     const { keyword } = req.query;
-//     const username = req.session.userId;
-//     const searchQuery = `
-//         SELECT * FROM stock 
-//         WHERE name LIKE ? OR upc LIKE ?`;
-
-//     db.query(searchQuery, [`%${keyword}%`, `%${keyword}%`], (err, results) => {
-//         if (err) {
-//             console.error('Error executing the search query:', err);
-//             res.status(500).send('Internal Server Error');
-//             return;
-//         }
-//         res.render('result.ejs', { results });
-//     });
-// });
+        // Render the dashboard.ejs as normal if there is no expiring items soon
+        res.render('dashboard', { shopName: "Stock Track", expiringSoon: false });
+    });
+});
 
 // Search route
 app.get('/search-result', redirectLogin, (req, res) => {
     const { keyword } = req.query;
     const username = req.session.userId;
-
+// SQL query to check against the stock table fields: name and upc
     const searchQuery = `
         SELECT * FROM stock 
         WHERE (name LIKE ? OR upc LIKE ?) AND username = ?`;
@@ -81,10 +67,12 @@ app.get('/search-result', redirectLogin, (req, res) => {
     });
 });
     
-    
+    // Route for register 
         app.get('/register', function (req,res) {
         res.render('register.ejs', shopData);
-    });                                                                                                                                               
+    });      
+    
+    //route for add stock item
     app.get('/addstockitem', redirectLogin, function (req,res) {
         res.render('addstockitem.ejs', shopData);
     });
@@ -139,7 +127,7 @@ app.post('/processSale', redirectLogin, (req, res) => {
     });
 });
 
-
+// for testing purposes
     app.get('/listusers', function(req, res) {
         // Query database to get all the users
         let sqlquery = "SELECT * FROM userdetails";
@@ -156,7 +144,7 @@ app.post('/processSale', redirectLogin, (req, res) => {
     });                                                                                                                                                
 
     app.get('/listStock', redirectLogin, function(req, res) {
-        const username = req.session.userId;
+        const username = req.session.userId; // use userID from session to check against username field in database linked by foriegn key constraint
     
         // Query database to get all the stock items added by the current user
         let sqlquery = "SELECT * FROM stock WHERE username = ?";
@@ -179,11 +167,12 @@ app.post('/processSale', redirectLogin, (req, res) => {
         });
     });
     
-
+// Login route
 app.get('/login', function (req,res) {
 res.render('login.ejs', shopData);
 }); 
 
+//log out route. works by deleting session data
 app.get('/logout', redirectLogin, (req,res) => {
     req.session.destroy(err => {
     if (err) {
@@ -192,13 +181,14 @@ app.get('/logout', redirectLogin, (req,res) => {
     res.send('you are now logged out. <a href='+'./'+'>Home</a>');
     })
 })
+//route to remove user
 app.get('/removeuser', redirectLogin, function (req,res) {
     res.render('removeuser.ejs', shopData);
 });
 app.post('/userremoved', redirectLogin, function (req, res) {
     const usernameToRemove = req.sanitize(req.body.username);
 
-    // delete from database
+    // delete from database by checking for matching data
     const deleteQuery = "DELETE FROM userdetails WHERE username = ?";
     db.query(deleteQuery, [usernameToRemove], (err, result) => {
         if (err) {
@@ -218,6 +208,7 @@ app.post('/userremoved', redirectLogin, function (req, res) {
     });
 });
 
+// api to obtain currency data
 
 const http = require('https');
     app.get('/currencyX', function (req, res) {
@@ -252,7 +243,7 @@ const http = require('https');
     });
 
 
-
+//post method to add stock items to table
 
 app.post('/stockItemAdded', function (req, res) {
     // Extract data from the request body
@@ -278,6 +269,8 @@ res.send('Stock item added successfully! Return to <a href="/dashboard">Dashboar
     });
 });
 
+// post method for register page
+// sql queries are used to ensure all fields are correctly filled
 
 app.post('/registered', [check('email').isEmail()], [check('password').isLength({ min: 8 }).withMessage('Please lengthen this text to 8 characters or more. (You are currently using  characters)')], function (req, res) {
     const errors = validationResult(req);
@@ -295,15 +288,16 @@ app.post('/registered', [check('email').isEmail()], [check('password').isLength(
                 return res.send('This username is already in use. Please choose something different');
             }
 
-            const bcrypt = require('bcrypt');
-            const saltRounds = 10;
-            const plainPassword = req.body.password;
+            const bcrypt = require('bcrypt'); // use bcrpty module to ensure password encryption and avoid storing plantext passwords
+            const saltRounds = 10; // salt used for protection
+            const plainPassword = req.body.password; 
 
             bcrypt.hash(plainPassword, saltRounds, function (err, hashedPassword) {
                 // Store hashed password in database.
                 let sqlquery = "INSERT INTO userdetails (username, first_name, last_name, email, hashedPassword) VALUES (?,?,?,?,?)";
                 // execute sql query
                 let newrecord = [req.sanitize(req.body.username), req.sanitize(req.body.first), req.sanitize(req.body.last), req.sanitize(req.body.email), hashedPassword];
+                // santise fields to ensure protection against XSS
 
                 db.query(sqlquery, newrecord, (err, result) => {
                     if (err) {
@@ -319,7 +313,9 @@ app.post('/registered', [check('email').isEmail()], [check('password').isLength(
     }
 });
                                                                                                                                             
-                                                                                                                                                      
+                        
+// post action for log in 
+
 app.post('/loggedin', function(req, res) {
     // Compare the form data with the data stored in the database
     let sqlquery = "SELECT hashedPassword FROM userdetails WHERE username = ?"; // query database to get the hashed password for the user
@@ -343,7 +339,7 @@ app.post('/loggedin', function(req, res) {
                     // Save user session here, when login is successful
                     req.session.userId = req.sanitize(req.body.username)
                     // The passwords match, login successful
-                    res.send('Welcome, ' + (req.sanitize(req.body.username)) + '! <a href="/Dashboard">Dashboard</a>');
+                    res.send('Welcome, ' + (req.sanitize(req.body.username)) + '! <a href="/Dashboard">Dashboard</a>'); // redirects to dashboards since user has logged in
 
                 } else {
                     //  login failed
@@ -354,161 +350,18 @@ app.post('/loggedin', function(req, res) {
     });
 });
 
-
-//   app.get('/upcomingExpiryItems', redirectLogin, function(req, res) {
-//     let today = new Date();
-//     let upcomingDate = new Date();
-//     upcomingDate.setDate(today.getDate() + 4); // Adjust for items expiring in 4 days or less
-
-//     // Query database to get upcoming stock items approaching expiry date
-//     let sqlQuery = "SELECT * FROM stock WHERE expiry <= ?";
-//     db.query(sqlQuery, [upcomingDate], (err, result) => {
-//         if (err) {
-//             console.error("Error retrieving upcoming expiry items:", err);
-//             res.redirect('./');
-//         } else {
-//             // Calculate suggested retail price adjustments
-//             let suggestedPriceAdjustments = result.map(item => {
-//                 let suggestedRetailPrice = (item.retailPrice - item.wholesalePrice) / 2 + item.wholesalePrice;
-//                 return { id: item.id, name: item.name, suggestedRetailPrice: suggestedRetailPrice };
-//             });
-//             res.render("upcomingExpiryItems.ejs", { items: suggestedPriceAdjustments });
-//         }
-//     });
-// });
-
-// app.post('/updateRetailPrice', redirectLogin, function(req, res) {
-//     console.log("Request Body:", req.body); // Log the entire request body
-
-//     let updates = req.body.updates; // Contains updated retail prices for items
-//     console.log("Updates:", updates); // Log the updates object
-
-//     if (!updates) {
-//         console.log("No updates received.");
-//         res.redirect('./upcomingExpiryItems');
-//         return;
-//     }
-
-//     // Update retail prices in the database
-//     let updateQueries = updates.map(update => {
-//         return db.query("UPDATE stock SET retailPrice = ? WHERE upc = ?", [update.retailPrice, update.upc]);
-//     });
-
-//     // Execute all update queries
-//     Promise.all(updateQueries)
-//         .then(() => {
-//             console.log("Retail prices updated successfully.");
-//             res.redirect('./upcomingExpiryItems');
-//         })
-//         .catch(err => {
-//             console.error("Error updating retail prices:", err);
-//             res.redirect('./upcomingExpiryItems');
-//         });
-// });
-//Working app.get
-// app.get('/upcomingExpiryItems', redirectLogin, function(req, res) {
-//     const username = req.session.userId;
-//     let today = new Date();
-//     let upcomingDate = new Date();
-//     upcomingDate.setDate(today.getDate() + 4); // Adjust for items expiring in 4 days or less
-
-//     // Query database to get upcoming stock items approaching expiry date for the current user
-//     let sqlQuery = "SELECT * FROM stock WHERE expiry <= ? AND username = ? AND quantity > 0";
-//     db.query(sqlQuery, [upcomingDate, username], (err, result) => {
-//         if (err) {
-//             console.error("Error retrieving upcoming expiry items:", err);
-//             res.redirect('./');
-//         } else {
-//             res.render("upcomingExpiryItems.ejs", { items: result });
-//         }
-//     });
-// });
-
-// working app.get 
-// app.get('/upcomingExpiryItems', redirectLogin, function(req, res) {
-//     const username = req.session.userId;
-//     let today = new Date();
-//     let upcomingDate = new Date();
-//     upcomingDate.setDate(today.getDate() + 4); // Adjust for items expiring in 4 days or less
-
-//     // Query database to get upcoming stock items approaching expiry date for the current user
-//     let sqlQuery = "SELECT *, (retailPrice - wholesalePrice) / 2 + wholesalePrice AS suggestedRetailPrice FROM stock WHERE expiry <= ? AND username = ? AND quantity > 0";
-//     db.query(sqlQuery, [upcomingDate, username], (err, result) => {
-//         if (err) {
-//             console.error("Error retrieving upcoming expiry items:", err);
-//             res.redirect('./');
-//         } else {
-//             res.render("upcomingExpiryItems.ejs", { items: result });
-//         }
-//     });
-// });
+// import nodemailer module and give app specific password for it to use email account and send emails
 
 const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: 'stocktrackteam@gmail.com', //  email address
-        pass: 'ttdi mhoh bjax cdkv' //  email password 
+        pass: 'ttdi mhoh bjax cdkv' //  email password - app specfic
     }
 });
 
-
-// working V2 but only email screen displays
-// app.get('/upcomingExpiryItems', redirectLogin, function(req, res) {
-//     const username = req.session.userId; // Assuming the session contains the user ID
-//     let today = new Date();
-//     let upcomingDate = new Date();
-//     upcomingDate.setDate(today.getDate() + 4); // Adjust for items expiring in 4 days or less
-
-//     // Query database to get upcoming stock items approaching expiry date for the current user
-//     let sqlQuery = "SELECT *, (retailPrice - wholesalePrice) / 2 + wholesalePrice AS suggestedRetailPrice FROM stock WHERE expiry <= ? AND username = ? AND quantity > 0";
-//     db.query(sqlQuery, [upcomingDate, username], (err, result) => {
-//         if (err) {
-//             console.error("Error retrieving upcoming expiry items:", err);
-//             res.redirect('./');
-//         } else {
-//             // Retrieve the user's email address from the database
-//             let emailQuery = "SELECT email FROM userdetails WHERE username = ?";
-//             db.query(emailQuery, [username], (err, emailResult) => {
-//                 if (err) {
-//                     console.error("Error retrieving user email:", err);
-//                     res.status(500).send("Internal server error");
-//                 } else if (emailResult.length === 0) {
-//                     res.status(404).send("User not found");
-//                 } else {
-//                     const userEmail = emailResult[0].email;
-//                     // Compose email message with the retrieved email address
-//                     const mailOptions = {
-//                         from: 'stocktrackteam@gmail.com',
-//                         to: userEmail, // Use the retrieved email address
-//                         subject: 'Upcoming Expiry Items',
-//                         html: `
-//                             <p>Dear ${username},</p>
-//                             <p>Your upcoming expiring items:</p>
-//                             <ul>
-//                                 ${result.map(item => `<li>${item.name} - Quantity: ${item.quantity} - Expiry Date: ${item.expiry}</li>`).join('')}
-//                             </ul>
-//                             <p>Please take necessary action.</p>
-//                             <p>Regards,<br>StockTrack Team</p>
-//                         `
-//                     };
-
-//                     // Send email
-//                     transporter.sendMail(mailOptions, (error, info) => {
-//                         if (error) {
-//                             console.error('Error sending email:', error);
-//                             res.status(500).send("Internal server error");
-//                         } else {
-//                             console.log('Email sent:', info.response);
-//                             res.status(200).send("Email sent successfully");
-//                         }
-//                     });
-//                 }
-//             });
-//         }
-//     });
-// });
-
+// route to obtain soon expiring stock items and also suggest price by calculation
 app.get('/upcomingExpiryItems', redirectLogin, function(req, res) {
     const username = req.session.userId;
     let today = new Date();
@@ -516,7 +369,8 @@ app.get('/upcomingExpiryItems', redirectLogin, function(req, res) {
     upcomingDate.setDate(today.getDate() + 4); // Adjust for items expiring in 4 days or less
 
     // Query database to get upcoming stock items approaching expiry date for the current user
-    let sqlQuery = "SELECT *, (retailPrice - wholesalePrice) / 2 + wholesalePrice AS suggestedRetailPrice FROM stock WHERE expiry <= ? AND username = ? AND quantity > 0";
+    let sqlQuery = "SELECT *, (retailPrice - wholesalePrice) / 2 + wholesalePrice AS suggestedRetailPrice FROM stock WHERE expiry <= ? AND username = ? AND quantity > 0"; 
+    // calculation ensures price will never be suggested below wholesale price
     db.query(sqlQuery, [upcomingDate, username], (err, result) => {
         if (err) {
             console.error("Error retrieving upcoming expiry items:", err);
@@ -543,7 +397,7 @@ app.get('/upcomingExpiryItems', redirectLogin, function(req, res) {
                             </ul>
                             <p>Please take necessary action.</p>
                             <p>Regards,<br>StockTrack Team</p>
-                        `
+                        ` // Default email format
                     };
 
                     // Send email
@@ -563,12 +417,12 @@ app.get('/upcomingExpiryItems', redirectLogin, function(req, res) {
     });
 });
 
+// route for wastage page
 
 app.get('/wastageAndReductions', redirectLogin, function(req, res) {
     res.render('wastageAndReductions.ejs', {errorMessage:""});
 });
-
-// Working app.post
+// Working app.post also able to set quantity to 0 and delete from the database
 app.post('/processWastageAndReductions', redirectLogin, function(req, res) {
     const { nameUPC, quantity, retailPrice } = req.body;
     const username = req.session.userId;
@@ -597,31 +451,78 @@ app.post('/processWastageAndReductions', redirectLogin, function(req, res) {
         let updateQuery = "";
         let updateValues = [];
 
-        if (quantity) {
-            // If quantity is provided, update the quantity of the item
-            updateQuery = "UPDATE stock SET quantity = ? WHERE id = ? AND username = ?";
-            updateValues = [quantity, item.id, username];
+        if (quantity !== undefined) {
+            if (quantity === '0') {
+                // If quantity is 0, delete the stock item
+                let deleteQuery = "DELETE FROM stock WHERE id = ? AND username = ?";
+                db.query(deleteQuery, [item.id, username], (err, result) => {
+                    if (err) {
+                        console.error("Error deleting item from database:", err);
+                        return res.status(500).send('Internal Server Error');
+                    }
+                    // Render page with a success message
+                    return res.render('wastageAndReductions.ejs', { errorMessage: 'Item deleted successfully.' });
+                });
+            } else {
+                // If quantity is provided and not 0, update the quantity of the item
+                updateQuery = "UPDATE stock SET quantity = ? WHERE id = ? AND username = ?";
+                updateValues = [quantity, item.id, username];
+            }
         } else {
             // If retail price is provided, update the retail price of the item
             updateQuery = "UPDATE stock SET retailPrice = ? WHERE id = ? AND username = ?";
             updateValues = [retailPrice, item.id, username];
         }
 
-        // Execute the update query
-        db.query(updateQuery, updateValues, (err, result) => {
-            if (err) {
-                console.error("Error updating database:", err);
-                return res.status(500).send('Internal Server Error');
-            }
+        if (updateQuery) {
+            db.query(updateQuery, updateValues, (err, result) => {
+                if (err) {
+                    console.error("Error updating database:", err);
+                    return res.status(500).send('Internal Server Error');
+                }
 
-            // Render the page with a success message
-            res.render('wastageAndReductions.ejs', { errorMessage: 'Item updated successfully.' });
-        });
+                // Render the page with a success message
+                res.render('wastageAndReductions.ejs', { errorMessage: 'Item updated successfully.' });
+            });
+        }
     });
 });
 
+// test barcode scanner route
 app.get('/BCSTest', redirectLogin, function (req,res) {
     res.render('BCSTest.ejs', shopData);
+});
+
+// Test Expired Page - sql query
+app.get('/expired', redirectLogin, function(req, res) {
+    const username = req.session.userId;
+    // Query the database for expired stock items specific to the current user by using req.session to match against
+    let sqlQuery = "SELECT * FROM stock WHERE expiry < CURDATE() AND username = ?";
+    db.query(sqlQuery, [username], (err, result) => {
+        if (err) {
+            console.error("Error querying database:", err);
+            return res.status(500).send('Internal Server Error');
+        }
+        // Render the expired.ejs page and pass the retrieved stock items to it
+        res.render('expired', { stockItems: result });
+    });
+});
+
+// Expired page Waste function - delete
+app.post('/waste', redirectLogin, function(req, res) {
+    // Extract the item id from the form data
+    let itemId = req.body.itemId;
+    const username = req.session.userId;
+    // Query to delete the stock item with the given id and username
+    let deleteQuery = "DELETE FROM stock WHERE id = ? AND username = ?";
+    db.query(deleteQuery, [itemId, username], (err, result) => {
+        if (err) {
+            console.error("Error deleting item from database:", err);
+            return res.status(500).send('Internal Server Error'); // wastage results in items being deleted
+        }
+        // Redirect back to the expired page after deletion 
+        res.redirect('/expired');
+    });
 });
 
 
