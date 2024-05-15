@@ -1,4 +1,4 @@
-/* Center the form */
+
 .add {
     max-width: 500px;
     margin: 0 auto;
@@ -8,7 +8,7 @@
     background-color: #f9f9f9;
 }
 
-/* Style form inputs */
+
 .add p {
     margin: 10px 0;
 }

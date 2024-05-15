@@ -20,22 +20,22 @@ a:link {
     padding:5px;
   }
   
-  /* visited link */
+
   a:visited {
     color: tomato;
     text-decoration: none;
     padding:5px;
   }
   
-  /* mouse over link */
+
   a:hover {
     color: white;
     text-decoration: none;
     background-color: orangered;
     padding:5px;
   }
-  
-  /* selected link */
+
+
   a:active {
     color: blue;
     text-decoration: none;
@@ -75,7 +75,7 @@ a:link {
 
 }
 
-/* Style for the search form */
+
 .searchbar {
   position: fixed;
   top: 0;
@@ -84,7 +84,7 @@ a:link {
   background: transparent;
 }
 
-/* Style for the input field */
+
 #keyword {
   border: 1px solid #ccc; 
   padding: 5px;
@@ -92,7 +92,7 @@ a:link {
   background: rgba(255, 255, 255, 0.8);
 }
 
-/* Style for the submit button */
+
 button {
   padding: 6px 10px;
   background-color: #4CAF50;
@@ -102,7 +102,7 @@ button {
   cursor: pointer;
 }
 
-/* Style for the label */
+
 label {
   color: white;
 }
@@ -159,7 +159,7 @@ ul {
   overflow: hidden;
 }
 
-/* menu drop down */
+
 
 .header {
   min-height: 100vh;
@@ -171,7 +171,6 @@ ul {
   overflow: hidden;
 }
 
-/* Style for the search form */
 .searchbar {
   position: fixed;
   top: 0;

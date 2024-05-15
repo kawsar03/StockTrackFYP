@@ -1,78 +1,67 @@
-<!-- <!doctype html>
-<html>
-  <head>
-    <link rel="stylesheet"  type="text/css" href="main.css"/>
-  </head>
-
-  <body>
-    <section class="header">
-
-      <form class = "searchbar" action="/search-result" method="get">
-        <label for="keyword">Enter your search term:</label>
-        <input type="text" id="keyword" name="keyword" placeholder="Search..." required>
-        <button type="submit">Search</button>
-    </form>
-
-    <h1>Welcome to <%=shopName%></h1>
-    <p><a href="about">About <%=shopName%></a></p>
-    <p><a href="register">Register with us</a></p>
-    <p><a href="listStock"> Add Stock and see Existing Stock Items!</a></p>
-    <p><a href="login"> Log into your account!</a></p>
-    <p><a href="logout"> Log Out!</a></p>
-    <p><a href="removeuser"> Remove a User</a></p>
-    <a href="listusers">List of Users!</a>
-    <p><a href="currencyX"> Convert Currency For Sales!</a></p>
-    <p><a href="Sales"> Sell Items here!</a></p>
-    <p><a href="upcomingExpiryitems"> Check expiring stock!</a></p>
-    <p><a href="wastageAndReductions"> Wastage And Reductions</a></p>
-    <p><a href="BCSTest"> BSC Test</a></p>
-
-
-
-  </section>
-
-  </body>
-</html> -->
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to <%= shopName %></title>
-    <link rel="stylesheet" type="text/css" href="index.css">
+    <link rel="stylesheet" type="text/css" href="index1.css">
 </head>
 <body>
-    <section class="header">
-        <div class="left-section">
-            <h1>Welcome to <%= shopName %></h1>
-            <p><a href="register">Register with us</a></p>
-            <p><a href="login"> Log into your account!</a></p>
-        </div>
-        <form class="searchbar" action="/search-result" method="get">
-            <label for="keyword">Enter your search term:</label>
-            <input type="text" id="keyword" name="keyword" placeholder="Search..." required>
-            <button type="submit">Search</button>
-        </form>
-    </section>
+  <div class="about-container">
+    <h1>StockTrack</h1>
+    <img src="images/Logo.png" alt="Logo 1" class="logo">
+    <p>Inventory Management made simple!</p>
+    <p>
+        Welcome to our project focused on developing and critically evaluating an application tailored for small businesses, including supermarkets and local stores, to combat food wastage. With a foundation in key areas of computer science such as algorithms, data structures, databases, and image processing and vision, our aim is to create an accessible and user-friendly solution. Our project objectives encompass evaluating existing stock management and inventory systems, identifying underutilized features, implementing appropriate data structures, devising algorithms for optimal pricing of expiring items, designing an intuitive GUI for enhanced usability, and rigorously testing each aspect of the application for effectiveness in reducing food wastage. Additionally, we are committed to conducting market research within our target demographic of small food and drink businesses to ensure our application meets their needs and effectively addresses the challenge of food wastage.
+    </p>
+  </div>
 
-    <section class="links">
-        <p><a href="listStock"> Add Stock and see Existing Stock Items!</a></p>
-        <p><a href="about">About <%= shopName %></a></p>
-        <p><a href="logout"> Log Out!</a></p>
-        <p><a href="removeuser"> Delete your Account</a></p>
-        <p><a href="currencyX"> Convert Currency For Sales!</a></p>
-        <p><a href="Sales"> Sell Items here!</a></p>
-        <p><a href="upcomingExpiryitems"> Check expiring stock!</a></p>
-        <p><a href="wastageAndReductions"> Wastage And Reductions</a></p>
-        <!-- For Test Purposes -->
-        <!-- <p><a href="BCSTest"> BSC Test</a></p> -->
-        <!-- <p><a href="listusers">List of Users!</a></p> -->
+  <div class="container">
+    <div class="slideshow-container">
+      <div class="slideshow-slide fade">
+          <img src="images/computer.jpeg" alt="Image 1">
+          <div class="caption">Access your business model. Any time! Any Device! Whether it is on the go or from your own house!</div>
+      </div>
+      
+      <div class="slideshow-slide fade">
+          <img src="images/phone.jpg" alt="Image 2">
+          <div class="caption">Access your business model. Any time! Any Device! Whether it is on the go or from your own house!</div>
+      </div>
+      
+      <div class="slideshow-slide fade">
+          <img src="images/tablet.jpg" alt="Image 3">
+          <div class="caption">Access your business model. Any time! Any Device! Whether it is on the go or from your own house!</div>
+      </div>
+    </div>
 
-    </section>
+    <div class="youtube-video-container">
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/VIDEO_ID" frameborder="0" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <div class="navbar">
+    <a href="/login">Login</a>
+    <a href="/register">Register</a>
+  </div>
+
+  <script>
+    var slideIndex = 0;
+    showSlides();
+
+    function showSlides() {
+        var slides = document.getElementsByClassName("slideshow-slide");
+        for (var i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none";  
+        }
+        slideIndex++;
+        if (slideIndex > slides.length) {slideIndex = 1}    
+        slides[slideIndex-1].style.display = "block";  
+        setTimeout(showSlides, 4000); 
+    }
+  </script>
 </body>
 </html>
+
+
 
 
 

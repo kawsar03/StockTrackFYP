@@ -21,7 +21,9 @@ const { check, validationResult } = require('express-validator');
         res.render('about.ejs', shopData);
     });        
     
-
+    app.get('/Dashboard', redirectLogin,function(req,res){
+        res.render('Dashboard.ejs', shopData);
+    });  
      
 
 
@@ -271,49 +273,52 @@ app.post('/stockItemAdded', function (req, res) {
             console.error('Error inserting data into the stock table:', err);
             return res.status(500).send('Internal Server Error');
         }
-        res.send('Stock item added successfully!');
+res.send('Stock item added successfully! Return to <a href="/dashboard">Dashboard</a>');
+
     });
 });
 
 
 app.post('/registered', [check('email').isEmail()], [check('password').isLength({ min: 8 }).withMessage('Please lengthen this text to 8 characters or more. (You are currently using  characters)')], function (req, res) {
     const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            res.redirect('./register'); }
-        else { 
-    // Check if username already exists
-    let existingUserQuery = "SELECT * FROM userdetails WHERE username = ?";
-    db.query(existingUserQuery, [req.body.username], (err, result) => {
-        if (err) {
-            return res.status(500).send('Internal Server Error');
-        }
+    if (!errors.isEmpty()) {
+        res.redirect('./register');
+    } else {
+        // Check if username already exists
+        let existingUserQuery = "SELECT * FROM userdetails WHERE username = ?";
+        db.query(existingUserQuery, [req.body.username], (err, result) => {
+            if (err) {
+                return res.status(500).send('Internal Server Error');
+            }
 
-        if (result.length > 0) {
-            return res.send('This username is already in use. Please choose something different');
-        }
-        const bcrypt = require('bcrypt');
-        const saltRounds = 10;
-        const plainPassword = req.body.password;
+            if (result.length > 0) {
+                return res.send('This username is already in use. Please choose something different');
+            }
 
-        bcrypt.hash(plainPassword, saltRounds, function (err, hashedPassword) {
-            // Store hashed password in database.
-            let sqlquery = "INSERT INTO userdetails (username, first_name, last_name, email, hashedPassword) VALUES (?,?,?,?,?)";
-            // execute sql query
-            let newrecord = [req.sanitize(req.body.username), req.sanitize(req.body.first), req.sanitize(req.body.last), req.sanitize(req.body.email), hashedPassword];
+            const bcrypt = require('bcrypt');
+            const saltRounds = 10;
+            const plainPassword = req.body.password;
 
-            db.query(sqlquery, newrecord, (err, result) => {
-                if (err) {
-                    return console.error(err.message);
-                } else {
-                    result = 'Hello ' + req.sanitize(req.body.first) + ' ' + req.sanitize(req.body.last) + ' you are now registered!  We will send an email to you at ' + req.sanitize(req.body.email);
-                    //result += 'Your password is: ' + req.body.password + ' and your hashed password is: ' + hashedPassword;
-                    res.send(result);
-                }
+            bcrypt.hash(plainPassword, saltRounds, function (err, hashedPassword) {
+                // Store hashed password in database.
+                let sqlquery = "INSERT INTO userdetails (username, first_name, last_name, email, hashedPassword) VALUES (?,?,?,?,?)";
+                // execute sql query
+                let newrecord = [req.sanitize(req.body.username), req.sanitize(req.body.first), req.sanitize(req.body.last), req.sanitize(req.body.email), hashedPassword];
+
+                db.query(sqlquery, newrecord, (err, result) => {
+                    if (err) {
+                        return console.error(err.message);
+                    } else {
+                        // Construct success message with login link
+                        const successMessage = `Thank you for registering your account at Stock Track. Click <a href="/login">here</a> to log into your account.`;
+                        res.send(successMessage);
+                    }
+                });
             });
         });
-    });
-}
-});                                                                                                                                              
+    }
+});
+                                                                                                                                            
                                                                                                                                                       
 app.post('/loggedin', function(req, res) {
     // Compare the form data with the data stored in the database
@@ -321,38 +326,34 @@ app.post('/loggedin', function(req, res) {
     // execute sql query
     let username = (req.sanitize(req.body.username));
     db.query(sqlquery, username, (err, result) => {
-      if (err) {
-        return console.error(err.message);
-      }
-      else if (result.length == 0) {
-        // No user found with that username
-        res.send('Invalid username or password');
-      }
-      else {
-        // User found, compare the passwords
-        let hashedPassword = result[0].hashedPassword;
-        const bcrypt = require('bcrypt');
-        bcrypt.compare((req.sanitize(req.body.password)), hashedPassword, function(err, result) {
-          if (err) {
-            // Handle error
+        if (err) {
             return console.error(err.message);
-          }
-          else if (result == true) {
-            // Save user session here, when login is successful
-            req.session.userId = req.sanitize(req.body.username)
-            // The passwords match, login successful
-            res.send('Welcome, ' + (req.sanitize(req.body.username)) + '!' + '<a href='+'./'+'> Home</a>');
-
-
-          }
-          else {
-            //  login failed
+        } else if (result.length == 0) {
+            // No user found with that username
             res.send('Invalid username or password');
-          }
-        });
-      }
+        } else {
+            // User found, compare the passwords
+            let hashedPassword = result[0].hashedPassword;
+            const bcrypt = require('bcrypt');
+            bcrypt.compare((req.sanitize(req.body.password)), hashedPassword, function(err, result) {
+                if (err) {
+                    // Handle error
+                    return console.error(err.message);
+                } else if (result == true) {
+                    // Save user session here, when login is successful
+                    req.session.userId = req.sanitize(req.body.username)
+                    // The passwords match, login successful
+                    res.send('Welcome, ' + (req.sanitize(req.body.username)) + '! <a href="/Dashboard">Dashboard</a>');
+
+                } else {
+                    //  login failed
+                    res.send('Invalid username or password');
+                }
+            });
+        }
     });
-  });
+});
+
 
 //   app.get('/upcomingExpiryItems', redirectLogin, function(req, res) {
 //     let today = new Date();

@@ -1,4 +1,4 @@
-/* Styles for the index page */
+
 .header {
     display: flex;
     justify-content: space-between;
@@ -38,12 +38,12 @@
     background-color: #f0f0f0;
   }
   
-  /* Styles for the index page */
+ 
 .links {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Two columns */
+    grid-template-columns: repeat(2, 1fr); 
     gap: 20px;
-    justify-content: center; /* Center the grid */
+    justify-content: center; 
   }
   
   .links a {
@@ -53,8 +53,8 @@
     padding: 10px;
     display: block;
     text-align: center;
-    width: 200px; /* Set width to control card size */
-    margin: auto; /* Center the cards */
+    width: 200px; 
+    margin: auto; 
   }
   
   .links a:hover {
