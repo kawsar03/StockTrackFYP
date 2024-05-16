@@ -428,7 +428,7 @@ app.post('/processWastageAndReductions', redirectLogin, function(req, res) {
     const username = req.session.userId;
 
     // Check if either quantity or retail price is provided
-    if (!quantity && !retailPrice) {
+    if (!quantity && retailPrice === undefined) {
         // If neither quantity nor retail price is provided, render the page again with an error message
         return res.render('wastageAndReductions.ejs', { errorMessage: 'Please provide either quantity or retail price.' });
     }
@@ -451,7 +451,7 @@ app.post('/processWastageAndReductions', redirectLogin, function(req, res) {
         let updateQuery = "";
         let updateValues = [];
 
-        if (quantity !== undefined) {
+        if (quantity !== undefined || retailPrice !== undefined) {
             if (quantity === '0') {
                 // If quantity is 0, delete the stock item
                 let deleteQuery = "DELETE FROM stock WHERE id = ? AND username = ?";
@@ -468,10 +468,14 @@ app.post('/processWastageAndReductions', redirectLogin, function(req, res) {
                 updateQuery = "UPDATE stock SET quantity = ? WHERE id = ? AND username = ?";
                 updateValues = [quantity, item.id, username];
             }
+            // Update the retail price if it's provided
+            if (retailPrice !== undefined) {
+                updateQuery = "UPDATE stock SET retailPrice = ? WHERE id = ? AND username = ?";
+                updateValues = [retailPrice, item.id, username];
+            }
         } else {
-            // If retail price is provided, update the retail price of the item
-            updateQuery = "UPDATE stock SET retailPrice = ? WHERE id = ? AND username = ?";
-            updateValues = [retailPrice, item.id, username];
+            // If neither quantity nor retail price is provided, render the page again with an error message
+            return res.render('wastageAndReductions.ejs', { errorMessage: 'Please provide either quantity or retail price.' });
         }
 
         if (updateQuery) {
@@ -487,6 +491,7 @@ app.post('/processWastageAndReductions', redirectLogin, function(req, res) {
         }
     });
 });
+
 
 // test barcode scanner route
 app.get('/BCSTest', redirectLogin, function (req,res) {
