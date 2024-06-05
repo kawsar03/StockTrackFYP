@@ -304,6 +304,7 @@ app.post('/registered', [
   
                   const saltRounds = 10; // salt used for protection
                   const plainPassword = req.body.password;
+                  const bcrypt = require('bcrypt');
   
                   bcrypt.hash(plainPassword, saltRounds, function (err, hashedPassword) {
                       if (err) {
