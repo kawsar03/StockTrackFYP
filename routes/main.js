@@ -272,51 +272,76 @@ res.send('Stock item added successfully! Return to <a href="/dashboard">Dashboar
 // post method for register page
 // sql queries are used to ensure all fields are correctly filled
 
-app.post('/registered', [check('email').isEmail()], [check('password').isLength({ min: 8 }).withMessage('Please lengthen this text to 8 characters or more. (You are currently using  characters)')], function (req, res) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        res.redirect('./register');
-    } else {
-        // Check if username already exists
-        let existingUserQuery = "SELECT * FROM userdetails WHERE username = ?";
-        db.query(existingUserQuery, [req.body.username], (err, result) => {
-            if (err) {
-                return res.status(500).send('Internal Server Error');
-            }
-
-            if (result.length > 0) {
-                return res.send('This username is already in use. Please choose something different');
-            }
-
-            const bcrypt = require('bcrypt'); // use bcrpty module to ensure password encryption and avoid storing plantext passwords
-            const saltRounds = 10; // salt used for protection
-            const plainPassword = req.body.password; 
-
-            bcrypt.hash(plainPassword, saltRounds, function (err, hashedPassword) {
-                // Store hashed password in database.
-                let sqlquery = "INSERT INTO userdetails (username, first_name, last_name, email, hashedPassword) VALUES (?,?,?,?,?)";
-                // execute sql query
-                let newrecord = [req.sanitize(req.body.username), req.sanitize(req.body.first), req.sanitize(req.body.last), req.sanitize(req.body.email), hashedPassword];
-                // santise fields to ensure protection against XSS
-
-                db.query(sqlquery, newrecord, (err, result) => {
-                    if (err) {
-                        return console.error(err.message);
-                    } else {
-                        // Construct success message with login link
-                        const successMessage = `Thank you for registering your account at Stock Track. Click <a href="/login">here</a> to log into your account.`;
-                        res.send(successMessage);
-                    }
-                });
-            });
-        });
-    }
-});
+app.post('/registered', [
+    check('email').isEmail(),
+    check('password').isLength({ min: 8 }).withMessage('Please lengthen this text to 8 characters or more. (You are currently using characters)')
+  ], function (req, res) {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+          return res.redirect('./register');
+      } else {
+          // Check if username already exists
+          let existingUserQuery = "SELECT * FROM userdetails WHERE username = ?";
+          db.query(existingUserQuery, [req.body.username], (err, result) => {
+              if (err) {
+                  return res.status(500).send('Internal Server Error');
+              }
+  
+              if (result.length > 0) {
+                  return res.send('This username is already in use. Please choose something different');
+              }
+  
+              // Check if email already exists
+              let existingEmailQuery = "SELECT * FROM userdetails WHERE email = ?";
+              db.query(existingEmailQuery, [req.body.email], (err, result) => {
+                  if (err) {
+                      return res.status(500).send('Internal Server Error');
+                  }
+  
+                  if (result.length > 0) {
+                      return res.send('This email is already in use. Please use a different email address');
+                  }
+  
+                  const saltRounds = 10; // salt used for protection
+                  const plainPassword = req.body.password;
+  
+                  bcrypt.hash(plainPassword, saltRounds, function (err, hashedPassword) {
+                      if (err) {
+                          return res.status(500).send('Internal Server Error');
+                      }
+  
+                      // Store hashed password in database.
+                      let sqlquery = "INSERT INTO userdetails (username, first_name, last_name, email, hashedPassword) VALUES (?,?,?,?,?)";
+                      // execute sql query
+                      let newrecord = [
+                          req.sanitize(req.body.username),
+                          req.sanitize(req.body.first),
+                          req.sanitize(req.body.last),
+                          req.sanitize(req.body.email),
+                          hashedPassword
+                      ];
+                      // sanitize fields to ensure protection against XSS
+  
+                      db.query(sqlquery, newrecord, (err, result) => {
+                          if (err) {
+                              return console.error(err.message);
+                          } else {
+                              // Construct success message with login link
+                              const successMessage = `Thank you for registering your account at Stock Track. Click <a href="/login">here</a> to log into your account.`;
+                              res.send(successMessage);
+                          }
+                      });
+                  });
+              });
+          });
+      }
+  });
                                                                                                                                             
                         
 // post action for log in 
 
 app.post('/loggedin', function(req, res) {
+
     // Compare the form data with the data stored in the database
     let sqlquery = "SELECT hashedPassword FROM userdetails WHERE username = ?"; // query database to get the hashed password for the user
     // execute sql query
@@ -339,7 +364,9 @@ app.post('/loggedin', function(req, res) {
                     // Save user session here, when login is successful
                     req.session.userId = req.sanitize(req.body.username)
                     // The passwords match, login successful
-                    res.send('Welcome, ' + (req.sanitize(req.body.username)) + '! <a href="/Dashboard">Dashboard</a>'); // redirects to dashboards since user has logged in
+                    // res.send('Welcome, ' + (req.sanitize(req.body.username)) + '! <a href="/Dashboard">Dashboard</a>'); // redirects to dashboards since user has logged in
+                    res.render('logcon.ejs', shopData
+                    );
 
                 } else {
                     //  login failed
@@ -530,6 +557,10 @@ app.post('/waste', redirectLogin, function(req, res) {
     });
 });
 
-
+// Change res.send ot render pages for CSS Feedback
+// Route for About page
+app.get('/logcon',function(req,res){
+    res.render('logcon.ejs', shopData);
+});  
     
 }

@@ -4,7 +4,10 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
+    background-color: #4685c4;
+
   }
+
   
   .login-container {
     width: 300px;
@@ -19,6 +22,7 @@ body {
     position: absolute;
     top: 10px;
     left: 10px;
+    mix-blend-mode: multiply;
   }
   
   .register {

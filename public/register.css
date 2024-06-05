@@ -1,4 +1,9 @@
 body {
+  background-color: #4685c4;
+  height: 100vh;
+  margin: 0;
+}
+body {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -19,6 +24,8 @@ body {
     position: absolute;
     top: 10px;
     left: 10px;
+    mix-blend-mode: multiply;
+
   }
   
   .register {

@@ -1,4 +1,8 @@
-
+body {
+    background-color: #4685c4;
+    height: 100vh;
+    margin: 0;
+  }
 .add {
     max-width: 500px;
     margin: 0 auto;
